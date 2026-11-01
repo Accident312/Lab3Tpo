@@ -77,7 +77,6 @@ def test_remove_partial_quantity(cart):
 
 
 def test_remove_full_quantity(cart):
-
     cart.add_item("p1", 5)
     cart.remove("p1", 5)
     assert "p1" not in cart.items
@@ -98,3 +97,37 @@ def test_remove_invalid_quantity(cart):
     cart.add_item("p1", 5)
     with pytest.raises(InvalidQuantityError):
         cart.remove("p1", 0)
+
+
+def test_calculate_empty_cart(cart):
+    assert cart.calculate() == 0.0
+
+
+def test_calculate_without_promo(cart):
+    cart.add_item("p1", 2)  
+    cart.add_item("p2", 4)  
+    assert cart.calculate() == 2200.0
+
+
+def test_apply_valid_promo(cart):
+    cart.apply_promo("DISCOUNT10")
+    assert cart.applied_promo == "DISCOUNT10"
+
+
+def test_apply_invalid_promo(cart):
+    with pytest.raises(InvalidPromoCodeError):
+        cart.apply_promo("FAKE_CODE")
+
+
+def test_calculate_with_promo(cart):
+    cart.add_item("p1", 2)  
+    cart.apply_promo("DISCOUNT10")  
+    assert cart.calculate() == 1800.0  
+
+
+def test_clear_promo(cart):
+    cart.add_item("p1", 2)
+    cart.apply_promo("DISCOUNT10")
+    cart.clear_promo()
+    assert cart.applied_promo is None
+    assert cart.calculate() == 2000.0  
