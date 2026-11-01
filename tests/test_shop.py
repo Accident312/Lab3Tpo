@@ -55,5 +55,46 @@ def test_add_item_negative_quantity(cart):
     with pytest.raises(InvalidQuantityError, match="Количество должно быть больше нуля"):
         cart.add_item("p1", -5)
 
+def test_add_item_not_in_catalog(cart):
+    with pytest.raises(ProductNotFoundError):
+        cart.add_item("unknown_id", 1)
 
 
+def test_add_item_exceeds_stock(cart):
+    with pytest.raises(InsufficientStockError):
+        cart.add_item("p1", 11)  
+
+
+def test_add_item_exceeds_stock_partial(cart):
+    cart.add_item("p1", 8)  
+    with pytest.raises(InsufficientStockError):
+        cart.add_item("p1", 3)  
+
+def test_remove_partial_quantity(cart):
+    cart.add_item("p1", 5)
+    cart.remove("p1", 2)
+    assert cart.items["p1"] == 3
+
+
+def test_remove_full_quantity(cart):
+
+    cart.add_item("p1", 5)
+    cart.remove("p1", 5)
+    assert "p1" not in cart.items
+
+
+def test_remove_full_by_none(cart):
+    cart.add_item("p1", 5)
+    cart.remove("p1", quantity=None)
+    assert "p1" not in cart.items
+
+
+def test_remove_not_in_cart(cart):
+    with pytest.raises(ItemNotInCartError):
+        cart.remove("p1")
+
+
+def test_remove_invalid_quantity(cart):
+    cart.add_item("p1", 5)
+    with pytest.raises(InvalidQuantityError):
+        cart.remove("p1", 0)
