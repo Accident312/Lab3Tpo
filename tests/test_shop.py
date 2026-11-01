@@ -15,6 +15,29 @@ def catalog():
 def cart(catalog):
     return ShoppingCart(product_catalog=catalog)
 
+def test_create_valid_product():
+    product = Product(product_id="p3", name="Товар", price=100.0, stock=10)
+    assert product.id == "p3"
+    assert product.name == "Товар"
+    assert product.price == 100.0
+    assert product.stock == 10
+
+def test_create_product_empty_id():
+    with pytest.raises(ValueError):
+        Product(product_id="", name="Товар", price=100.0, stock=10)
+
+
+def test_create_product_negative_price():
+    with pytest.raises(ValueError):
+        Product(product_id="p1", name="Товар", price=-10.0, stock=10)
+
+
+def test_create_product_negative_stock():
+    with pytest.raises(ValueError):
+        Product(product_id="p1", name="Товар", price=100.0, stock=-1)
+
+
+
 def test_add_item_success(cart):
     cart.add_item("p1", 3)
     assert cart.items["p1"] == 3
@@ -31,5 +54,6 @@ def test_add_item_zero_quantity(cart):
 def test_add_item_negative_quantity(cart):
     with pytest.raises(InvalidQuantityError, match="Количество должно быть больше нуля"):
         cart.add_item("p1", -5)
+
 
 
